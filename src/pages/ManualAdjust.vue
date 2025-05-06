@@ -1,7 +1,7 @@
 <template>
   <div class="manual-adjust">
     <div class="header">
-      <h1>手动课程调整</h1>
+      <h1>教师申请审核</h1>
       <p class="description">以下为待处理的排课申请：</p>
     </div>
 
