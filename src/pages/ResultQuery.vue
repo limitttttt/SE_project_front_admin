@@ -12,6 +12,12 @@
       <el-form-item label="教室名">
         <el-input v-model="search.room" placeholder="请输入教室名" clearable />
       </el-form-item>
+      <el-form-item label="课程学期">
+        <el-select v-model="search.term" placeholder="请选择学期" clearable style="width: 180px;">
+          <el-option label="24-25秋冬" value="24-25秋冬" />
+          <el-option label="24-25春夏" value="24-25春夏" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleSearch">查询</el-button>
         <el-button @click="handleReset">重置</el-button>
@@ -19,21 +25,22 @@
       </el-form-item>
     </el-form>
 
-    <!-- 普通表格展示（未搜索状态） -->
+    <!-- 普通表格展示（未输入教师名和教室名时） -->
     <el-table
       v-if="!search.teacher && !search.room"
-      :data="resultList"
+      :data="filteredResults"
       style="width: 100%; margin-top: 20px;"
       border
     >
       <el-table-column prop="course" label="课程名" />
       <el-table-column prop="class" label="学院" />
+      <el-table-column prop="term" label="课程学期" />
       <el-table-column prop="time" label="上课时间" />
       <el-table-column prop="room" label="教室" />
       <el-table-column prop="teacher" label="教师" />
     </el-table>
 
-    <!-- 课表展示（有搜索关键词时） -->
+    <!-- 课表展示（当输入教师名或教室名时） -->
     <div v-else id="print-area">
       <table class="schedule-table">
         <thead>
@@ -67,6 +74,7 @@ import { ElMessage } from 'element-plus';
 interface ScheduleResult {
   course: string;
   class: string;
+  term: string;
   time: string;
   room: string;
   teacher: string;
@@ -74,21 +82,32 @@ interface ScheduleResult {
 
 // 模拟数据
 const resultList = ref<ScheduleResult[]>([
-  { course: '数据库系统', class: '计算机学院', time: '周二第3-4节', room: '东二201', teacher: '张老师' },
-  { course: '操作系统', class: '计算机学院', time: '周四第1-2节', room: '东二202', teacher: '李老师' },
-  { course: '数据结构基础', class: '计算机学院', time: '周三第5-6节', room: '东一101', teacher: '王老师' },
+  { course: '数据库系统', class: '计算机学院', term: '24-25秋冬', time: '周二第3-4节', room: '东二201', teacher: '张老师' },
+  { course: '操作系统', class: '计算机学院', term: '24-25秋冬', time: '周四第1-2节', room: '东二202', teacher: '李老师' },
+  { course: '数据结构基础', class: '计算机学院', term: '24-25春夏', time: '周三第5-6节', room: '东一101', teacher: '王老师' },
 ]);
 
-// 搜索项
-const search = ref({ teacher: '', room: '' });
+// 搜索条件
+const search = ref({ teacher: '', room: '', term: '' });
 
-// 搜索（可留空）
+// 自动筛选数据
+const filteredResults = computed(() => {
+  return resultList.value.filter(item => {
+    const matchTeacher = item.teacher.includes(search.value.teacher);
+    const matchRoom = item.room.includes(search.value.room);
+    const matchTerm = search.value.term ? item.term === search.value.term : true;
+    return matchTeacher && matchRoom && matchTerm;
+  });
+});
+
+// 搜索按钮逻辑（当前依赖 computed 可省略）
 const handleSearch = () => {};
 
-// 重置搜索
+// 重置搜索条件
 const handleReset = () => {
   search.value.teacher = '';
   search.value.room = '';
+  search.value.term = '';
 };
 
 // 打印课表
@@ -100,23 +119,13 @@ const handlePrint = () => {
   window.print();
 };
 
-// 过滤结果
-const filteredResults = computed(() => {
-  return resultList.value.filter(item => {
-    const matchTeacher = item.teacher.includes(search.value.teacher);
-    const matchRoom = item.room.includes(search.value.room);
-    return matchTeacher && matchRoom;
-  });
-});
-
-// 课表数据结构
+// 星期与时间段
 const weekDays = ['周一', '周二', '周三', '周四', '周五'];
 const timeSlots = ['第1-2节', '第3-4节', '第5-6节'];
 
-// 当前视图类型
 const isTeacherView = computed(() => !!search.value.teacher);
 
-// 获取指定格子的课程
+// 课表定位函数
 const getCourseAt = (day: string, slot: string) => {
   return filteredResults.value.find(item => item.time.includes(day) && item.time.includes(slot));
 };
@@ -150,6 +159,7 @@ h1 {
   align-items: center;
   gap: 10px;
 }
+
 .schedule-table {
   width: 100%;
   border-collapse: collapse;
@@ -201,7 +211,6 @@ h1 {
 .el-table__row:hover {
   background-color: #f0f4ff !important;
 }
-
 </style>
 
 <style>

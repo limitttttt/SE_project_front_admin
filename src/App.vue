@@ -275,7 +275,7 @@ button:hover, .el-button:hover {
   border-radius: 6px;
   transition: background-color 0.3s;
   display: flex;
-  justify-content: space-between; /* ✅ 左右对齐 */
+  justify-content: space-between;
   align-items: center;
   color: white;
 }
@@ -306,7 +306,7 @@ button:hover, .el-button:hover {
 }
 
 .arrow-icon {
-  margin-left: auto;         /* ✅ 将箭头推到最右边 */
+  margin-left: auto;
   font-size: 12px;
   transform: rotate(0deg);
   transition: transform 0.3s ease;

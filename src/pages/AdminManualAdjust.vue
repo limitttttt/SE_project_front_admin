@@ -12,6 +12,12 @@
       <el-form-item label="教师名称">
         <el-input v-model="search.teacher" placeholder="请输入教师名称" clearable />
       </el-form-item>
+      <el-form-item label="课程学期">
+        <el-select v-model="search.term" placeholder="请选择学期" clearable style="width: 180px;">
+          <el-option label="24-25秋冬" value="24-25秋冬" />
+          <el-option label="24-25春夏" value="24-25春夏" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="fetchCourses">搜索</el-button>
         <el-button @click="resetSearch">重置</el-button>
@@ -23,6 +29,7 @@
       <el-table-column prop="courseName" label="课程名称" />
       <el-table-column prop="teacherName" label="教师名称" />
       <el-table-column prop="college" label="学院" />
+      <el-table-column prop="term" label="课程学期" />
       <el-table-column prop="time" label="上课时间" />
       <el-table-column prop="classroom" label="教室" />
       <el-table-column label="操作" width="100">
@@ -54,14 +61,32 @@
 import { ref, computed } from 'vue'
 
 const courses = ref([
-  { id: 1, courseName: '离散数学', teacherName: '张老师', college: '计算机学院', time: '周一第1-2节', classroom: '东一101' },
-  { id: 2, courseName: '计算机基础', teacherName: '李老师', college: '计算机学院', time: '周二第3-4节', classroom: '东二203' },
+  {
+    id: 1,
+    courseName: '离散数学',
+    teacherName: '张老师',
+    college: '计算机学院',
+    term: '24-25秋冬',
+    time: '周一第1-2节',
+    classroom: '东一101'
+  },
+  {
+    id: 2,
+    courseName: '计算机基础',
+    teacherName: '李老师',
+    college: '计算机学院',
+    term: '24-25秋冬',
+    time: '周二第3-4节',
+    classroom: '东二203'
+  }
 ])
 
-const search = ref({ course: '', teacher: '' })
+const search = ref({ course: '', teacher: '', term: '' })
 const filteredCourses = computed(() =>
   courses.value.filter(c =>
-    c.courseName.includes(search.value.course) && c.teacherName.includes(search.value.teacher)
+    c.courseName.includes(search.value.course) &&
+    c.teacherName.includes(search.value.teacher) &&
+    (!search.value.term || c.term === search.value.term)
   )
 )
 
@@ -82,12 +107,13 @@ function saveEdit() {
 }
 
 function fetchCourses() {
-  // 接口查询逻辑
+  // 由于已是响应式筛选，可保留为空
 }
 
 function resetSearch() {
   search.value.course = ''
   search.value.teacher = ''
+  search.value.term = ''
 }
 </script>
 
