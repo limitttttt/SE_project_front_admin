@@ -2,12 +2,23 @@
   <div class="layout">
     <aside class="sidebar">
       <h2>课程安排子系统</h2>
-      <nav>
-        <router-link to="/resource-manage">教学资源管理</router-link>
-        <router-link to="/auto-schedule">自动排课</router-link>
-        <router-link to="/manual-adjust">手动课程调整</router-link>
-        <router-link to="/result-query">排课结果查询</router-link>
-      </nav>
+        <nav>
+          <router-link to="/resource-manage">教学资源管理</router-link>
+          <router-link to="/auto-schedule">自动排课</router-link>
+          <div class="menu-group">
+            <div class="menu-title" @click="toggleManualMenu">
+              手动课程调整
+              <span class="arrow-icon" :class="{ rotated: manualMenuOpen }">▼</span>
+            </div>
+            <transition name="fade">
+              <div v-show="manualMenuOpen" class="submenu">
+                <router-link to="/manual-adjust/teacher-review">教师申请审核</router-link>
+                <router-link to="/manual-adjust/admin-adjust">管理员手动调整</router-link>
+              </div>
+            </transition>
+          </div>
+          <router-link to="/result-query">排课结果查询</router-link>
+        </nav>
     </aside>
 
     <main class="content">
@@ -50,6 +61,12 @@ const logout = () => {
   alert('退出登录')
   // 这里可以添加真正的退出逻辑，比如跳转到登录页
 }
+
+const manualMenuOpen = ref(false)
+const toggleManualMenu = () => {
+  manualMenuOpen.value = !manualMenuOpen.value
+}
+
 </script>
 
 <style scoped>
@@ -228,4 +245,83 @@ button:hover, .el-button:hover {
   color: white;
   font-weight: bold;
 }
+
+.submenu-group {
+  margin-bottom: 20px;
+}
+
+.submenu-title {
+  font-weight: bold;
+  margin: 10px 0 5px;
+  padding-left: 4px;
+  font-size: 15px;
+  color: #f0f0f0;
+}
+
+.submenu-group a {
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.menu-group {
+  margin-bottom: 15px;
+}
+
+.menu-title {
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+  display: flex;
+  justify-content: space-between; /* ✅ 左右对齐 */
+  align-items: center;
+  color: white;
+}
+
+.menu-title:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.submenu {
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.submenu a {
+  font-size: 14px;
+  margin: 4px 0;
+  padding: 6px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: white;
+}
+
+.submenu a.router-link-active {
+  font-weight: bold;
+  border-left: 3px solid white;
+  padding-left: 7px;
+}
+
+.arrow-icon {
+  margin-left: auto;         /* ✅ 将箭头推到最右边 */
+  font-size: 12px;
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
+
+.arrow-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  height: 0;
+}
+
 </style>
