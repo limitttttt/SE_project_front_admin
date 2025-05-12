@@ -25,13 +25,14 @@
       </el-form-item>
     </el-form>
 
-    <!-- 普通表格展示（未输入教师名和教室名时） -->
+    <!-- 普通表格展示 -->
     <el-table
       v-if="!search.teacher && !search.room"
       :data="filteredResults"
       style="width: 100%; margin-top: 20px;"
       border
     >
+      <el-table-column prop="courseId" label="课程编号" width="120" />
       <el-table-column prop="course" label="课程名" />
       <el-table-column prop="class" label="学院" />
       <el-table-column prop="term" label="课程学期" />
@@ -40,7 +41,7 @@
       <el-table-column prop="teacher" label="教师" />
     </el-table>
 
-    <!-- 课表展示（当输入教师名或教室名时） -->
+    <!-- 课表展示 -->
     <div v-else id="print-area">
       <table class="schedule-table">
         <thead>
@@ -54,6 +55,7 @@
             <td class="slot-label">{{ slot }}</td>
             <td v-for="day in weekDays" :key="day" class="slot-cell">
               <div v-if="getCourseAt(day, slot)">
+                <div class="course-id">({{ getCourseAt(day, slot)?.courseId }})</div>
                 <div class="course-name">{{ getCourseAt(day, slot)?.course }}</div>
                 <div class="course-info">
                   {{ isTeacherView ? getCourseAt(day, slot)?.room : getCourseAt(day, slot)?.teacher }}
@@ -68,67 +70,66 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ref, computed } from 'vue'
+import { ElMessage } from 'element-plus'
 
 interface ScheduleResult {
-  course: string;
-  class: string;
-  term: string;
-  time: string;
-  room: string;
-  teacher: string;
+  courseId: string
+  course: string
+  class: string
+  term: string
+  time: string
+  room: string
+  teacher: string
 }
 
 // 模拟数据
 const resultList = ref<ScheduleResult[]>([
-  { course: '数据库系统', class: '计算机学院', term: '24-25秋冬', time: '周二第3-4节', room: '东二201', teacher: '张老师' },
-  { course: '操作系统', class: '计算机学院', term: '24-25秋冬', time: '周四第1-2节', room: '东二202', teacher: '李老师' },
-  { course: '数据结构基础', class: '计算机学院', term: '24-25春夏', time: '周三第5-6节', room: '东一101', teacher: '王老师' },
-]);
+  { courseId: 'CS101', course: '数据库系统', class: '计算机学院', term: '24-25秋冬', time: '周二第3-4节', room: '东二201', teacher: '张老师' },
+  { courseId: 'CS102', course: '操作系统', class: '计算机学院', term: '24-25秋冬', time: '周四第1-2节', room: '东二202', teacher: '李老师' },
+  { courseId: 'CS103', course: '数据结构基础', class: '计算机学院', term: '24-25春夏', time: '周三第5-6节', room: '东一101', teacher: '王老师' }
+])
 
-// 搜索条件
-const search = ref({ teacher: '', room: '', term: '' });
+const search = ref({ teacher: '', room: '', term: '' })
 
-// 自动筛选数据
-const filteredResults = computed(() => {
-  return resultList.value.filter(item => {
-    const matchTeacher = item.teacher.includes(search.value.teacher);
-    const matchRoom = item.room.includes(search.value.room);
-    const matchTerm = search.value.term ? item.term === search.value.term : true;
-    return matchTeacher && matchRoom && matchTerm;
-  });
-});
+const filteredResults = computed(() =>
+  resultList.value.filter(item =>
+    item.teacher.includes(search.value.teacher) &&
+    item.room.includes(search.value.room) &&
+    (!search.value.term || item.term === search.value.term)
+  )
+)
 
-// 搜索按钮逻辑（当前依赖 computed 可省略）
-const handleSearch = () => {};
-
-// 重置搜索条件
+const handleSearch = () => {}
 const handleReset = () => {
-  search.value.teacher = '';
-  search.value.room = '';
-  search.value.term = '';
-};
+  search.value.teacher = ''
+  search.value.room = ''
+  search.value.term = ''
+}
 
-// 打印课表
 const handlePrint = () => {
   if (!search.value.teacher && !search.value.room) {
-    ElMessage.warning('请先输入教师名或教室名后再打印课表');
-    return;
+    ElMessage.warning('请先输入教师名或教室名后再打印课表')
+    return
   }
-  window.print();
-};
+  window.print()
+}
 
-// 星期与时间段
-const weekDays = ['周一', '周二', '周三', '周四', '周五'];
-const timeSlots = ['第1-2节', '第3-4节', '第5-6节'];
+const weekDays = ['周一', '周二', '周三', '周四', '周五']
+const timeSlots = [
+  '第1-2节',
+  '第3-4节',
+  '第5-6节',
+  '第7-8节',
+  '第9-10节',
+  '第11-12节'
+]
 
-const isTeacherView = computed(() => !!search.value.teacher);
+const isTeacherView = computed(() => !!search.value.teacher)
 
-// 课表定位函数
 const getCourseAt = (day: string, slot: string) => {
-  return filteredResults.value.find(item => item.time.includes(day) && item.time.includes(slot));
-};
+  return filteredResults.value.find(item => item.time.includes(day) && item.time.includes(slot))
+}
 </script>
 
 <style scoped>
@@ -178,6 +179,10 @@ h1 {
   background-color: #f0f0f0;
   font-weight: bold;
   width: 100px;
+}
+.course-id {
+  font-size: 12px;
+  color: #888;
 }
 .course-name {
   font-weight: bold;

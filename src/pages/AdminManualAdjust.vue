@@ -26,6 +26,7 @@
 
     <!-- 表格展示 -->
     <el-table :data="filteredCourses" style="width: 100%; margin-top: 20px;" border>
+      <el-table-column prop="courseId" label="课程编号" width="120" /> <!-- ✅ 新增 -->
       <el-table-column prop="courseName" label="课程名称" />
       <el-table-column prop="teacherName" label="教师名称" />
       <el-table-column prop="college" label="学院" />
@@ -42,6 +43,9 @@
     <!-- 编辑弹窗 -->
     <el-dialog title="修改课程安排" v-model="dialogVisible" width="30%">
       <el-form :model="editForm">
+        <el-form-item label="课程编号">
+          <el-input v-model="editForm.courseId" disabled />
+        </el-form-item>
         <el-form-item label="上课时间">
           <el-input v-model="editForm.time" />
         </el-form-item>
@@ -63,6 +67,7 @@ import { ref, computed } from 'vue'
 const courses = ref([
   {
     id: 1,
+    courseId: 'CS101',
     courseName: '离散数学',
     teacherName: '张老师',
     college: '计算机学院',
@@ -72,6 +77,7 @@ const courses = ref([
   },
   {
     id: 2,
+    courseId: 'CS102',
     courseName: '计算机基础',
     teacherName: '李老师',
     college: '计算机学院',
@@ -82,6 +88,7 @@ const courses = ref([
 ])
 
 const search = ref({ course: '', teacher: '', term: '' })
+
 const filteredCourses = computed(() =>
   courses.value.filter(c =>
     c.courseName.includes(search.value.course) &&
@@ -91,7 +98,7 @@ const filteredCourses = computed(() =>
 )
 
 const dialogVisible = ref(false)
-const editForm = ref({ id: null, time: '', classroom: '' })
+const editForm = ref({ id: null, courseId: '', time: '', classroom: '' })
 
 function editCourse(course) {
   editForm.value = { ...course }
@@ -107,7 +114,7 @@ function saveEdit() {
 }
 
 function fetchCourses() {
-  // 由于已是响应式筛选，可保留为空
+  // 筛选由 computed 实现，无需重复逻辑
 }
 
 function resetSearch() {

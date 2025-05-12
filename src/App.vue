@@ -12,6 +12,7 @@
             </div>
             <transition name="fade">
               <div v-show="manualMenuOpen" class="submenu">
+                <router-link to="/manual-adjust/teacher-request">教师申请</router-link>
                 <router-link to="/manual-adjust/teacher-review">教师申请审核</router-link>
                 <router-link to="/manual-adjust/admin-adjust">管理员手动调整</router-link>
               </div>

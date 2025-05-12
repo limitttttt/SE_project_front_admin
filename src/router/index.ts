@@ -1,10 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
 
-import AutoSchedule from '../pages/AutoSchedule.vue';
-import ManualAdjust from '../pages/ManualAdjust.vue'; // 教师申请审核
-import AdminManualAdjust from '../pages/AdminManualAdjust.vue'; // 管理员手动调整
-import ResourceManage from '../pages/ResourceManage.vue';
-import ResultQuery from '../pages/ResultQuery.vue';
+import AutoSchedule from '../pages/AutoSchedule.vue'
+import ManualAdjust from '../pages/ManualAdjust.vue' // 教师申请审核
+import AdminManualAdjust from '../pages/AdminManualAdjust.vue' // 管理员手动调整
+import ResourceManage from '../pages/ResourceManage.vue'
+import ResultQuery from '../pages/ResultQuery.vue'
+
+// ✅ 新增教师申请页面（懒加载）
+const TeacherRequest = () => import('../pages/TeacherRequest.vue')
 
 const routes = [
   { path: '/', redirect: '/resource-manage' },
@@ -12,8 +15,13 @@ const routes = [
   {
     path: '/manual-adjust',
     name: 'ManualAdjust',
-    redirect: '/manual-adjust/teacher-review',
+    redirect: '/manual-adjust/teacher-request',
     children: [
+      {
+        path: 'teacher-request',
+        name: 'TeacherRequest',
+        component: TeacherRequest,
+      },
       {
         path: 'teacher-review',
         name: 'TeacherReview',
@@ -28,9 +36,9 @@ const routes = [
   },
   { path: '/resource-manage', name: 'ResourceManage', component: ResourceManage },
   { path: '/result-query', name: 'ResultQuery', component: ResultQuery },
-];
+]
 
 export const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
