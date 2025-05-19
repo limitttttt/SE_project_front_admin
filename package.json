@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://chhhhhzh.github.io/SE_project_front",
+  "homepage": "https://limitttttt.github.io/SE_project_front_admin",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
